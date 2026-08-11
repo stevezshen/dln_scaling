@@ -1,0 +1,4 @@
+# Native MLX stack for Python >=3.10 and recent Apple silicon/macOS.
+mlx==0.32.0
+numpy>=1.26,<3.0
+matplotlib>=3.8,<3.11

@@ -1,0 +1,85 @@
+{
+  "output_root": "output",
+  "cases": [
+    "hard-horizon",
+    "hard-constant",
+    "easy-horizon",
+    "easy-constant"
+  ],
+  "modes": 512,
+  "sgd_paths": 8,
+  "sgd_batch_size": 8,
+  "depth": 10,
+  "horizon": 10000.0,
+  "eta_peak": 0.001,
+  "figure_files": [
+    "output/figures/sde.png",
+    "output/figures/sde.pdf",
+    "output/figures/comparison.png",
+    "output/figures/comparison.pdf",
+    "output/figures/decay.png",
+    "output/figures/decay.pdf"
+  ],
+  "decay": {
+    "hard-horizon": {
+      "decay_start_time": 6996.9970703125,
+      "sde_mean_at_decay_start": 0.011795425802120008,
+      "sde_final_mean": 0.0014684471025248058,
+      "sde_mean_decay_factor": 8.032584750134541,
+      "sde_final_median": 0.0013905282830819488,
+      "sde_median_decay_factor": 5.929384178403752,
+      "sgd_mean_at_decay_start": 0.011591436224989593,
+      "sgd_final_mean": 0.0011464865820016712,
+      "sgd_mean_decay_factor": 10.110398505276791,
+      "sgd_final_median": 0.001146304071880877,
+      "sgd_median_decay_factor": 10.923478042389325,
+      "final_second_order": 0.001145269488915801,
+      "final_gradient_flow": 0.00114056549500674
+    },
+    "hard-constant": {
+      "decay_start_time": 6996.9970703125,
+      "sde_mean_at_decay_start": 0.02608458316535689,
+      "sde_final_mean": 0.009702981013106182,
+      "sde_mean_decay_factor": 2.6883061123301655,
+      "sde_final_median": 0.00935295782983303,
+      "sde_median_decay_factor": 1.7502772671229998,
+      "sgd_mean_at_decay_start": 0.0245163650251925,
+      "sgd_final_mean": 0.00920359801966697,
+      "sgd_mean_decay_factor": 2.663780509840174,
+      "sgd_final_median": 0.00920471828430891,
+      "sgd_median_decay_factor": 1.8640074645689464,
+      "final_second_order": 0.009202409535646439,
+      "final_gradient_flow": 0.00920130405575037
+    },
+    "easy-horizon": {
+      "decay_start_time": 6996.9970703125,
+      "sde_mean_at_decay_start": 0.010494850237137143,
+      "sde_final_mean": 0.00025172549800345223,
+      "sde_mean_decay_factor": 41.6916455439616,
+      "sde_final_median": 0.00014677044964628294,
+      "sde_median_decay_factor": 17.554050552407432,
+      "sgd_mean_at_decay_start": 0.016385756605814095,
+      "sgd_final_mean": 1.9582188315325766e-05,
+      "sgd_mean_decay_factor": 836.7684112704594,
+      "sgd_final_median": 1.9605094166763593e-05,
+      "sgd_median_decay_factor": 402.5072395291359,
+      "final_second_order": 1.9488801626721397e-05,
+      "final_gradient_flow": 1.845803126343526e-05
+    },
+    "easy-constant": {
+      "decay_start_time": 6996.9970703125,
+      "sde_mean_at_decay_start": 0.008674730219354387,
+      "sde_final_mean": 0.000692426625164444,
+      "sde_mean_decay_factor": 12.528013661078141,
+      "sde_final_median": 0.00020006761769764125,
+      "sde_median_decay_factor": 11.752092985568943,
+      "sgd_mean_at_decay_start": 0.02788657307974063,
+      "sgd_final_mean": 7.879149688960752e-05,
+      "sgd_mean_decay_factor": 353.9287128763615,
+      "sgd_final_median": 7.884968727012165e-05,
+      "sgd_median_decay_factor": 284.0448265360071,
+      "final_second_order": 7.895607268437743e-05,
+      "final_gradient_flow": 7.790041854605079e-05
+    }
+  }
+}
