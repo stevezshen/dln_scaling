@@ -20,10 +20,83 @@ output/
 └── metadata/
 ```
 
-The saved figures are `sde.{png,pdf}`, `comparison.{png,pdf}`,
-`decay.{png,pdf}`, `convergence.png`, `learning.png`, `batches.png`, and
-`covariance.png`. The retained arrays and run metadata are included under
-`output/data/` and `output/metadata/`.
+## Figures
+
+The PNG and PDF versions of a figure contain the same curves. The retained
+arrays and run metadata are under `output/data/` and `output/metadata/`.
+
+### [SDE](output/figures/sde.png) ([PDF](output/figures/sde.pdf))
+
+This is the four-panel reproduction of the manuscript figure. The panels cross
+the hard and easy spectra with horizon-dependent and constant-order initial
+conditions. The dashed curve is gradient flow $\mathcal E_t^{(0)}$. The
+dash-dotted curve adds the first correction,
+$\mathcal E_t^{(0)}+\eta_{\rm peak}\mathbb E[\mathcal E_t^{(2)}]$. The blue
+curve and band show the mean and the 5th--95th percentiles of the simulated SDE
+paths. The SDE mean follows the corrected curve through most of training, while
+its final value depends strongly on the numerical step bounds.
+
+### [Comparison](output/figures/comparison.png) ([PDF](output/figures/comparison.pdf))
+
+This figure adds direct SGD with fresh Gaussian samples to the four SDE panels.
+Solid lines are means and dotted lines are medians. The vertical line at
+$t\simeq7000$ marks the start of learning-rate decay. Direct SGD learns in all
+four regimes and finishes close to the second-order prediction. At
+$\eta_{\rm peak}=10^{-3}$, the four relative endpoint errors are $0.002\%$,
+$0.124\%$, $1.04\%$, and $0.119\%$. The SDE endpoint is visibly higher in the
+easy panels and in the hard horizon-dependent panel.
+
+### [Decay](output/figures/decay.png) ([PDF](output/figures/decay.pdf))
+
+This is a magnified view of $7000\leq t\leq10000$. The faint gray curve is the
+normalized learning rate $\eta(t)/\eta_{\rm peak}$. From the start of decay to
+the endpoint, the SGD mean risk falls by factors of $10.1$, $2.66$,
+$837$, and $354$ in panel order. The SGD curves in the easy regimes therefore learn
+strongly during decay, despite the less convincing pathwise SDE curves in the
+original reproduction.
+
+### [Convergence](output/figures/convergence.png)
+
+The upper panels compare SDE means after successively halving the allowed drift
+and diffusion increments. The lower panels show final means and Monte Carlo
+standard errors. The black diamonds use 64 paths at the selected bounds, and
+the dashed line is the second-order prediction. In the easy horizon-dependent
+case, the quarter and eighth bounds agree within sampling error, around
+$8\times10^{-5}$, while the prediction is $1.95\times10^{-5}$. The easy
+constant-order case retains a visible step dependence. These checks show that
+the pathwise Euler--Maruyama result has a substantial numerical bias at the
+endpoint.
+
+### [Learning](output/figures/learning.png)
+
+Each panel plots the direct SGD endpoint error against $\eta_{\rm peak}$ for
+gradient flow and the second-order approximation. The displayed slopes are
+least-squares fits on the three log--log points. The easy horizon-dependent
+case gives slopes $1.12$ and $2.91$: the correction removes the leading error
+and leaves a much smaller residual. The three points in each hard regime leave
+the small-$\eta$ scaling unresolved, although their endpoint errors at
+$\eta_{\rm peak}=10^{-3}$ remain small.
+
+### [Batches](output/figures/batches.png)
+
+This figure compares direct SGD with batches $1$, $2$, $4$, and $8$ in the easy
+constant-order case. The optimizer step scales with the batch so that
+$\text{step}/\text{batch}=\eta_{\rm peak}$ remains fixed. All four endpoints
+lie within about two Monte Carlo standard errors of the second-order
+prediction. Any systematic batch dependence lies below the Monte Carlo
+resolution of this experiment.
+
+### [Covariance](output/figures/covariance.png)
+
+The left panel compares the diagonal-noise SDE, the SDE with the exact Gaussian
+gradient covariance, direct SGD, and their perturbative curves in the hard
+horizon-dependent regime. The diagonal SDE, full SDE, and direct SGD endpoints
+are $0.002134$, $0.002155$, and $0.001145$. Including the off-diagonal
+covariance therefore leaves the SDE--SGD gap essentially unchanged. The right
+panel repeats the SDE at $\eta_{\rm peak}=2.5\times10^{-4}$ with halved step
+bounds. The endpoint moves from $0.001666$ to $0.002103$, a $26\%$ change. This
+step sensitivity makes the pathwise SDE curves unsuitable as a numerical test
+of the perturbative prediction.
 
 ## Environment
 
