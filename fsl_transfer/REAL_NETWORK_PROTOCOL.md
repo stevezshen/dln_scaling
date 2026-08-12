@@ -5,7 +5,7 @@ diagonal model.
 
 ## Stage A: MLP
 
-- Dataset: MNIST or Fashion-MNIST with a prespecified train/validation split.
+- Dataset: MNIST or Fashion-MNIST with a fixed train/validation split.
 - One shuffled pass through unique training examples.
 - Loss: validation negative log likelihood at fixed example-count checkpoints;
   training negative log likelihood is reported separately.
@@ -46,6 +46,5 @@ loss floor.  Report schedule-held-out log RMSE and terminal error against:
 3. a monotone spline using intrinsic time and cumulative squared learning rate;
 4. a per-schedule refit as a descriptive ceiling.
 
-The network result supports the FSL ansatz only if its frozen transfer error is
+The network result supports the empirical FSL if its frozen transfer error is
 consistently below these baselines across seeds and schedules.
-

@@ -1,13 +1,13 @@
 # One-pass FSL schedule-transfer experiments
 
 This directory tests whether an FSL calibrated on constant-learning-rate
-one-pass SGD trajectories predicts unseen learning-rate schedules.  It is
-self-contained and does not modify or import the existing `experiments/`
-suite.
+one-pass SGD trajectories predicts unseen learning-rate schedules.  All code
+and results for this study stay here.  The existing `experiments/` suite
+remains unchanged.
 
-The confirmatory claim is schedule transfer in a synthetic diagonal network.
-MLP and convolutional experiments are a later external-validity test.  Read
-`WORKLOG.md` before changing the protocol.
+The main claim is schedule transfer in a synthetic diagonal network.  MLP and
+convolutional experiments come after the diagonal study.  Read `WORKLOG.md`
+before changing the protocol.
 
 ## Environment
 
@@ -30,6 +30,12 @@ The quick pilot will be:
 .venv-mlx312/bin/python fsl_transfer/run.py --preset smoke
 ```
 
+The retained pilot uses $128$ paired paths and $d=16$:
+
+```bash
+.venv-mlx312/bin/python fsl_transfer/run.py --preset pilot
+```
+
 The retained diagonal study will use:
 
 ```bash
@@ -39,11 +45,11 @@ The retained diagonal study will use:
 Results are written under `fsl_transfer/results/`, which is ignored by Git.
 The report records calibration schedules, frozen fitted parameters, metrics on
 each held-out schedule, uncertainty intervals, and positivity diagnostics.
+`PILOT_REPORT.md` gives the retained Metal result and its interpretation.
 
 ## Interpretation
 
-Passing the diagonal experiment means that the schedule-dependent convolution
-is a useful predictive surrogate for this finite one-pass SGD system.  It does
-not turn the one-sided theorem into a two-sided equality.  Passing an MLP or
-convolutional experiment supports an empirical ansatz outside the theorem.
-
+A diagonal result supports the schedule-dependent convolution for the tested
+finite one-pass SGD systems.  The theorem remains a one-sided statement.
+An MLP or convolutional result would support the empirical formula for that
+network.

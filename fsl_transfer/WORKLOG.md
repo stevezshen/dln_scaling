@@ -12,9 +12,9 @@ Can a functional scaling law calibrated only on constant-learning-rate
 one-pass SGD trajectories predict the population excess-risk trajectory under
 an unseen learning-rate schedule?
 
-The important word is **predict**.  Fitting a separate five-parameter curve to
-each schedule tests interpolation capacity and does not establish schedule
-transfer.
+The important word is **predict**.  A schedule-transfer test fits one set of
+parameters on constant rates and freezes them before evaluating new schedules.
+A separate five-parameter fit to each schedule only measures fit error.
 
 ## Evidence inspected
 
@@ -24,9 +24,8 @@ transfer.
    schedule dependence enters through `eta_n^2` and remaining intrinsic time.
 2. `draft_new.tex`, Section "Numerical Form of the FSL" and Appendix
    "FSL for DLNs", fits five parameters separately to post-warmup trajectories.
-   The fit discards warmup memory, does not report schedule-held-out error,
-   does not compare with a schedule-blind baseline, and gives no parameter or
-   prediction uncertainty.
+   The fit discards warmup memory.  It lacks held-out schedules, an
+   intrinsic-time baseline, and uncertainty intervals.
 3. Li et al., *Functional Scaling Laws in Kernel Regression* (arXiv:2509.19189,
    version 4), fit three linear coefficients to averaged kernel-SGD curves.
    Their LLM experiment has the stronger protocol: fit the 8-1-1 trajectory
@@ -45,14 +44,14 @@ The experiments should distinguish four claims.
    predict new seeds at the same constant rate.
 3. **Schedule transfer:** parameters fitted only to constant-rate runs predict
    new schedule shapes without refitting.
-4. **Architecture transfer:** the same ansatz predicts MLP or convolutional
-   network losses.  This is an empirical extension and is not covered by the
-   diagonal-network theorem.
+4. **Network transfer:** the same formula predicts MLP or convolutional-network
+   losses.  This claim concerns those experiments; the theorem concerns
+   diagonal networks.
 
 Claim 3 is the primary test.  Claim 1 is too weak.  Claim 4 should be attempted
 only after Claim 3 succeeds in the diagonal model.
 
-## Theory-faithful discrete surrogate
+## Discrete formula from the proof
 
 For depth $L$, put
 
@@ -83,7 +82,7 @@ $$
 K_d^{(c_k)}(t)=\sum_{j\le d}j^{-2p}e^{-c_ktj^{-p}}.
 $$
 
-The first-response FSL used for the primary fit is
+The first Picard iterate used for the primary fit is
 
 $$
 \widehat E_q
@@ -98,9 +97,17 @@ The coefficients are constrained to be nonnegative.  The primary model shares
 one coefficient between the two convolution terms; the relaxed diagnostic
 allows $a_R$ and $a_\sigma$ to differ.  The decay constants $c_s,c_k$ are
 selected on the calibration trajectories only.  The exponents $p,s$ remain
-fixed at their known synthetic values in the confirmatory analysis.
+fixed at their known synthetic values in the main analysis.
 
-This surrogate is preferable to a free five-parameter power curve because:
+For the slope-independent initialization, the barrier part containing
+$\Theta_{j,0}$ can be much larger than the observed risk.  It enters the proof
+as part of a one-sided bound.  The empirical equality therefore uses the first
+sum in $S_{d,0}^{(c_s)}$ as its signal basis.  A separate diagnostic restores
+the barrier part and records the resulting error.  For proportional
+initialization with $u_{j,0}=\rho u_j^*$ and $\rho\in[3/4,1)$, the barrier
+part vanishes.
+
+This formula has four advantages over a free five-parameter power curve:
 
 - it retains the complete schedule from step zero;
 - it uses the finite-mode profiles actually appearing in the proof;
@@ -108,10 +115,9 @@ This surrogate is preferable to a free five-parameter power curve because:
 - the amplitude fit is a small nonnegative least-squares problem;
 - every fitted quantity is frozen before evaluating a new schedule.
 
-The full discrete Volterra recurrence is a secondary model.  The theorem is an
-upper bound rather than an equality, so a successful first-response transfer
-test is evidence for the schedule-response mechanism, not a verification of
-two-sided equality.
+The full discrete Volterra recurrence is a secondary model.  The theorem gives
+an upper bound.  Successful transfer of the first Picard iterate supports the
+schedule dependence in that bound.
 
 ## Synthetic protocol
 
@@ -134,14 +140,16 @@ two-sided equality.
 The main experiment uses the slope-independent initialization
 
 $$
-u_{j,0}=c_{\rm init}T_N^{-1/\alpha}j^{\beta/\alpha}.
+u_{j,0}=c_{\rm init}T_{\rm ref}^{-1/\alpha}j^{\beta/\alpha},
+\qquad T_{\rm ref}=N\eta_{\rm mid}.
 $$
 
-Because $T_N$ changes with the schedule, its value and the resulting initial
-condition are stored with every trajectory.  The finite signal profile is
-computed from that actual initialization.  A proportional initialization is a
-mechanism check because it gives the cleanest signal profile, but it is not the
-main result.
+Every schedule in a transfer study starts from this same initialization.  The
+low and high constant schedules have total times $0.8T_{\rm ref}$ and
+$1.2T_{\rm ref}$, which remain comparable to $d^p$ under the theorem's
+assumption.  The finite signal profile uses the stored initial condition.  A
+proportional initialization gives the cleanest signal profile and is included
+as a secondary experiment.
 
 ### Calibration and test split
 
@@ -150,9 +158,8 @@ main result.
 - Held-out schedules: cosine, WSD, cyclic, and late-drop.
 - Keep $d,N,L,\beta,\chi,\sigma$ fixed within a transfer study.
 - Normalize transfer schedules so their total intrinsic time matches the
-  middle constant-rate run.  This prevents total training time from revealing
-  the answer and keeps the initialization identical for the central transfer
-  comparison.
+  middle constant-rate run.  Every calibration and transfer trajectory uses
+  the same initialization.
 - Repeat hard ($\chi<0$), boundary ($\chi=0$), and easy ($\chi>0$) regimes.
 - Repeat at $L=2,5,10$ after the pilot.
 
@@ -165,7 +172,7 @@ main result.
 5. Zero-label-noise and at least two positive values of $\sigma$.
 6. At least three truncations $d$ or an analytic omitted-tail correction.
 7. At least three peak-rate scales to expose discretization failure.
-8. Full Volterra recurrence versus first response.
+8. Full Volterra recurrence versus its first Picard iterate.
 
 ### Metrics and uncertainty
 
@@ -178,16 +185,15 @@ main result.
 - positivity failures and maximal relative layer update;
 - sensitivity to $d$, number of paths, checkpoint density, and fitted window.
 
-A compelling result requires schedule transfer to beat the signal-only
-baseline on all prespecified held-out schedules, with uncertainty intervals,
-without changing parameters.  One favorable schedule is exploratory evidence.
+A compelling result beats the signal-only and intrinsic-time baselines on all
+held-out schedules, with uncertainty intervals and frozen parameters.  Results
+are reported separately for every schedule.
 
 ## MLP and convolutional networks
 
-These are worthwhile as external-validity tests, with a separate claim.
-The theory does not identify their kernel or signal exponents during feature
-learning.  The protocol should therefore call the fitted formula an FSL
-ansatz.
+These experiments make a separate claim about conventional networks.  Their
+kernel and signal exponents are learned from the constant-rate trajectories.
+The fitted expression is called an empirical FSL.
 
 - Use validation negative log likelihood as the primary loss and show training
   loss separately.  Accuracy is too discontinuous for trajectory fitting.
@@ -198,15 +204,14 @@ ansatz.
 - Report parameter-matched and FLOP-matched depth comparisons; fixed width is
   insufficient because parameters and compute grow with depth.
 - Compare a floor-inclusive signal model and simpler spline/exponential
-  baselines.  A flexible FSL ansatz must win out of sample.
-- For a literal one-pass study, use each base example once.  Random augmentation
-  changes the sample but does not make reuse of the same image independent;
-  this distinction must be reported.
+  baselines.  Compare their held-out errors.
+- For a literal one-pass study, use each base example once.  Report augmentation
+  and every reuse of a base image.
 - Start with an MLP on Fashion-MNIST or MNIST.  Move to a small convolutional
   network on CIFAR-10 only after the diagonal schedule-transfer gate passes.
 
-The practical network ansatz may use learned effective exponents, but they
-must be shared across schedules and fitted only on calibration runs.  Batch
+The network FSL may use learned effective exponents.  They are shared across
+schedules and fitted only on calibration runs.  Batch
 size enters the noise feature as $\eta_n^2/B$.
 
 ## MLX decision
@@ -218,17 +223,28 @@ block of SGD updates.  Host synchronization is restricted to checkpoints.
 
 The repository already contains an MLX 0.32.0 environment.  In the sandbox,
 MLX imports but Metal is unavailable; a GPU run must be executed with host
-permission.  A NumPy reference implementation is retained for unit tests of
-the fitter and schedule algebra, not as the paper-scale simulation backend.
+permission.  A NumPy implementation checks the fitter and schedule algebra on
+small tests.  Retained simulations use MLX Metal.
 
 ## Current implementation status
 
-- [x] Experimental question and falsifiable protocol fixed.
+- [x] Experimental question and pass criteria fixed.
 - [x] Problems in the draft experiment identified.
 - [x] Original FSL paper's fitting and schedule-transfer experiments reviewed.
-- [ ] MLX diagonal simulator.
-- [ ] Finite-profile FSL fitter and baselines.
-- [ ] Automated pilot and report.
+- [x] MLX diagonal simulator with explicit Metal selection and stability checks.
+- [x] Finite-profile first Picard iterate and discrete Volterra fits.
+- [x] Intrinsic-time and signal-only baselines.
+- [x] Automated Metal pilot, paired bootstrap, plot, and JSON report.
 - [ ] Real-network trajectory adapter.
-- [ ] Metal pilot results.
+- [x] Real-network protocol.
+- [x] Metal pilot results summarized in `PILOT_REPORT.md`.
 
+## Current conclusion
+
+The retained hard-regime pilot supports held-out transfer for cosine, WSD, and
+late-drop schedules.  It fails against the intrinsic-time baseline for the
+cyclic schedule.  The discrete Volterra recurrence improves final-risk
+prediction over its first Picard iterate.  In the boundary regime, separate
+coefficients for state-dependent and label-noise forcing are required for good
+transfer.  The next experiments should test dimension scaling and finite-step
+error before moving to an MLP.
